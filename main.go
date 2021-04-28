@@ -108,7 +108,7 @@ func banner() {
 	██║     ██████╔╝███████║██║██╔██║╚██║
 	██║     ██╔══██╗╚════██║████╔╝██║ ██║
 	╚██████╗██║  ██║     ██║╚██████╔╝ ██║ HTTP Basic Auth cracker,
-	 ╚═════╝╚═╝  ╚═╝     ╚═╝ ╚═════╝  ╚═╝ Telegram: @allfatherx`
+	 ╚═════╝╚═╝  ╚═╝     ╚═╝ ╚═════╝  ╚═╝ `
 
 	color.Blue(bannerArt)
 	color.Yellow("Please use -help to view command list")
